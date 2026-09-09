@@ -292,11 +292,11 @@ async function checkBackendHealth() {
     if (!res.ok) throw new Error("Health check returned error");
     const data = await res.json();
     if (data.status === "ok") {
-      dom.statusLabel.textContent = "DistilBERT Local AI: Ready";
+      dom.statusLabel.textContent = "Model Service: Connected";
       dom.serverStatus.classList.remove("offline");
     }
   } catch (err) {
-    dom.statusLabel.textContent = "DistilBERT: Connecting...";
+    dom.statusLabel.textContent = "Model Service: Reconnecting...";
   }
 }
 
@@ -322,7 +322,7 @@ function loadPresetSample(sample) {
     accordion.open = true;
   }
 
-  dom.statusMessage.textContent = "Sample loaded. Click 'Analyze & Detect Thread' or press Ctrl+Enter.";
+  dom.statusMessage.textContent = "Scenario loaded. Click 'Analyze Thread' or press Ctrl+Enter.";
   dom.statusMessage.className = "form-status";
 }
 
@@ -406,8 +406,8 @@ async function handleAnalyze() {
   }
 
   dom.analyzeBtn.disabled = true;
-  dom.analyzeBtn.querySelector(".btn-text").textContent = "Analyzing Neural Signals...";
-  dom.statusMessage.textContent = "Inspecting DistilBERT embeddings & header signatures...";
+  dom.analyzeBtn.querySelector(".btn-text").textContent = "Analyzing...";
+  dom.statusMessage.textContent = "Evaluating sequence patterns and RFC headers...";
   dom.statusMessage.className = "form-status";
 
   const payload = {
@@ -438,7 +438,7 @@ async function handleAnalyze() {
     dom.statusMessage.className = "form-status error";
   } finally {
     dom.analyzeBtn.disabled = false;
-    dom.analyzeBtn.querySelector(".btn-text").textContent = "Analyze & Detect Thread";
+    dom.analyzeBtn.querySelector(".btn-text").textContent = "Analyze Thread";
   }
 }
 
@@ -453,7 +453,9 @@ function renderAnalysisResult(data, subject, body) {
 
   // 1. Verdict Banner
   dom.verdictBanner.className = `verdict-banner ${isThread ? "thread" : "new"}`;
-  dom.verdictIcon.textContent = isThread ? "🧵" : "✉️";
+  const SVG_THREAD = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 10 4 15 9 20"></polyline><path d="M20 4v7a4 4 0 0 1-4 4H4"></path></svg>`;
+  const SVG_STANDALONE = `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path></svg>`;
+  dom.verdictIcon.innerHTML = isThread ? SVG_THREAD : SVG_STANDALONE;
   dom.verdictBadge.textContent = isThread ? "THREAD DETECTED" : "STANDALONE EMAIL";
   dom.verdictTitle.textContent = isThread
     ? "Part of an Active Conversation Thread"
@@ -539,7 +541,7 @@ function renderAnalysisResult(data, subject, body) {
     const li = document.createElement("li");
     const bullet = document.createElement("span");
     bullet.className = `reason-bullet ${isThread ? "" : "neutral"}`;
-    bullet.textContent = isThread ? "✓" : "•";
+    bullet.textContent = isThread ? "✓" : "—";
     const text = document.createElement("span");
     text.textContent = reason;
     li.appendChild(bullet);
@@ -670,7 +672,7 @@ function renderHistoryTable() {
       <td style="font-weight: 500;">${escapeHtml(item.subject)}</td>
       <td>
         <span class="table-badge ${item.isThread ? "thread" : "new"}">
-          ${item.isThread ? "🧵 Thread Reply" : "✉️ Standalone"}
+          ${item.isThread ? "Thread Reply" : "Standalone"}
         </span>
       </td>
       <td><strong>${confPct}%</strong></td>
@@ -713,7 +715,7 @@ async function handleBatchScan() {
   }
 
   dom.btnRunBatch.disabled = true;
-  dom.btnRunBatch.innerHTML = '<span class="btn-icon">⏳</span> Scanning Batch...';
+  dom.btnRunBatch.innerHTML = '<span class="btn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span> Scanning...';
 
   try {
     const res = await fetch(`${API_BASE}/api/batch-predict`, {
@@ -730,7 +732,7 @@ async function handleBatchScan() {
     alert("Batch Error: " + err.message);
   } finally {
     dom.btnRunBatch.disabled = false;
-    dom.btnRunBatch.innerHTML = '<span class="btn-icon">⚡</span> Run Batch Scan';
+    dom.btnRunBatch.innerHTML = '<span class="btn-icon"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></span> Execute Batch Scan';
   }
 }
 

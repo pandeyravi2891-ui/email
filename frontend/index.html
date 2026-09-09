@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="ThreadPulse AI — High-accuracy Email Thread Detector & Conversation Analytics Dashboard powered by fine-tuned DistilBERT and RFC Header heuristics." />
-  <title>ThreadPulse AI — Email Thread Detector & Dashboard</title>
+  <meta name="description" content="ThreadScope — Email conversation threading & RFC 822 heuristic analyzer powered by sequence classification." />
+  <title>ThreadScope — Email Thread Intelligence</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -16,32 +16,47 @@
     <!-- Top Navigation Header -->
     <header class="app-header">
       <div class="header-left">
-        <div class="brand-logo">
-          <div class="logo-glow"></div>
-          <span class="logo-icon">⚡</span>
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
         </div>
         <div class="brand-text">
           <div class="brand-title-wrap">
-            <h1 class="brand-title">ThreadPulse<span class="highlight">.AI</span></h1>
-            <span class="version-tag">v2.0</span>
+            <h1 class="brand-title">ThreadScope</h1>
+            <span class="version-tag">v1.4</span>
           </div>
-          <p class="brand-subtitle">Email Conversation & Thread Detection Intelligence</p>
+          <p class="brand-subtitle">Email Conversation Triage & RFC Header Intelligence</p>
         </div>
       </div>
 
       <div class="header-center">
         <nav class="nav-tabs" role="tablist">
           <button class="nav-tab active" id="tab-analyzer" role="tab" aria-selected="true" data-target="view-analyzer">
-            <span class="tab-icon">🔍</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
             <span>Thread Analyzer</span>
           </button>
           <button class="nav-tab" id="tab-batch" role="tab" aria-selected="false" data-target="view-batch">
-            <span class="tab-icon">📦</span>
-            <span>Batch Thread Scanner</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            <span>Batch Clustering</span>
           </button>
           <button class="nav-tab" id="tab-history" role="tab" aria-selected="false" data-target="view-history">
-            <span class="tab-icon">📊</span>
-            <span>Scan Log & History</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <span>Audit Trail</span>
             <span class="history-badge" id="nav-history-count">0</span>
           </button>
         </nav>
@@ -49,33 +64,39 @@
 
       <div class="header-right">
         <div class="server-status-pill" id="server-status">
-          <span class="status-dot pulsing"></span>
-          <span class="status-label" id="status-label">DistilBERT Local AI: Ready</span>
+          <span class="status-dot"></span>
+          <span class="status-label" id="status-label">Model Service: Connected</span>
         </div>
       </div>
     </header>
 
-    <!-- Top KPI Metric Dashboard Cards -->
+    <!-- Metrics Row -->
     <section class="dashboard-kpis" aria-label="Detection Metrics Dashboard">
       <div class="kpi-card" id="kpi-total-card">
         <div class="kpi-icon-wrap kpi-blue">
-          <span>📨</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Total Emails Evaluated</span>
+          <span class="kpi-label">Evaluated Messages</span>
           <div class="kpi-value-row">
             <h2 class="kpi-value" id="kpi-total">0</h2>
-            <span class="kpi-subtext">emails scanned</span>
+            <span class="kpi-subtext">emails indexed</span>
           </div>
         </div>
       </div>
 
       <div class="kpi-card" id="kpi-threads-card">
         <div class="kpi-icon-wrap kpi-emerald">
-          <span>🧵</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="9 10 4 15 9 20"></polyline>
+            <path d="M20 4v7a4 4 0 0 1-4 4H4"></path>
+          </svg>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Threads Detected</span>
+          <span class="kpi-label">Thread Replies</span>
           <div class="kpi-value-row">
             <h2 class="kpi-value kpi-emerald-text" id="kpi-threads">0</h2>
             <span class="kpi-chip kpi-emerald-chip" id="kpi-thread-pct">0%</span>
@@ -88,10 +109,14 @@
 
       <div class="kpi-card" id="kpi-standalone-card">
         <div class="kpi-icon-wrap kpi-cyan">
-          <span>✉️</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Standalone / New Emails</span>
+          <span class="kpi-label">Standalone / New Inquiries</span>
           <div class="kpi-value-row">
             <h2 class="kpi-value kpi-cyan-text" id="kpi-standalone">0</h2>
             <span class="kpi-chip kpi-cyan-chip" id="kpi-standalone-pct">0%</span>
@@ -104,13 +129,16 @@
 
       <div class="kpi-card" id="kpi-confidence-card">
         <div class="kpi-icon-wrap kpi-violet">
-          <span>🎯</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
         </div>
         <div class="kpi-info">
-          <span class="kpi-label">Average AI Confidence</span>
+          <span class="kpi-label">Mean Classification Score</span>
           <div class="kpi-value-row">
             <h2 class="kpi-value kpi-violet-text" id="kpi-confidence">0.0%</h2>
-            <span class="kpi-subtext">DistilBERT certainty</span>
+            <span class="kpi-subtext">model certainty</span>
           </div>
         </div>
         <div class="kpi-progress">
@@ -127,35 +155,45 @@
         <div class="analyzer-grid">
           
           <!-- Left Column: Input Studio -->
-          <div class="card glass-card studio-card">
+          <div class="card studio-card">
             
             <div class="card-header">
               <div class="card-title-group">
-                <span class="section-badge">Input Studio</span>
-                <h2 class="card-title">Inspect Email for Thread Signals</h2>
+                <span class="section-badge">Email Inspector</span>
+                <h2 class="card-title">Analyze Email & RFC Metadata</h2>
               </div>
               <div class="preset-btn-group">
-                <button class="btn-ghost btn-sm" id="btn-raw-modal-open" title="Paste raw email message with RFC headers">
-                  <span class="btn-icon">📋</span> Paste Raw EML
+                <button class="btn btn-secondary btn-sm" id="btn-raw-modal-open" title="Paste raw email message with RFC headers">
+                  <span class="btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                  </span>
+                  <span>Paste Raw EML</span>
                 </button>
               </div>
             </div>
 
             <!-- Quick Preset Samples -->
             <div class="preset-samples-wrapper">
-              <span class="preset-samples-title">1-Click Quick Samples:</span>
+              <span class="preset-samples-title">Test Scenarios:</span>
               <div class="preset-chips">
                 <button class="sample-chip" data-sample="reply-full">
-                  <span class="sample-icon">💬</span> Re: Scope Clarification (Thread)
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                  <span>Client Scope Clarification (Reply)</span>
                 </button>
                 <button class="sample-chip" data-sample="quote-body">
-                  <span class="sample-icon">↩️</span> Quoted Text Reply (Thread)
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
+                  <span>Quoted Sprint Discussion (Reply)</span>
                 </button>
                 <button class="sample-chip" data-sample="standalone-sales">
-                  <span class="sample-icon">📢</span> Cold Enterprise Outreach (New)
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                  <span>Cold Outbound Intro (Standalone)</span>
                 </button>
                 <button class="sample-chip" data-sample="fwd-approval">
-                  <span class="sample-icon">📨</span> Fwd: Budget Sign-off (Thread)
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"></polyline><path d="M4 20v-7a4 4 0 0 1 4-4h12"></path></svg>
+                  <span>Budget Approval Sign-off (Forward)</span>
                 </button>
               </div>
             </div>
@@ -164,16 +202,21 @@
             <form id="email-form" class="studio-form" onsubmit="return false;">
               <div class="form-group">
                 <div class="label-row">
-                  <label for="subject" class="form-label">Email Subject</label>
-                  <span class="label-hint" id="subject-hint">Checked for Re:, Fwd: prefixes</span>
+                  <label for="subject" class="form-label">Subject Line</label>
+                  <span class="label-hint" id="subject-hint">Evaluates Re:, Fwd:, and clean topic</span>
                 </div>
                 <div class="input-with-icon">
-                  <span class="input-icon">🏷️</span>
+                  <span class="input-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                  </span>
                   <input 
                     type="text" 
                     id="subject" 
                     class="form-control" 
-                    placeholder="e.g. Re: Q3 Product Roadmap & Sprint Timelines" 
+                    placeholder="e.g. Re: Q3 Engineering Deliverables" 
                     autocomplete="off"
                   />
                   <button type="button" class="btn-clear-field" id="clear-subject" title="Clear Subject" hidden>&times;</button>
@@ -182,7 +225,7 @@
 
               <div class="form-group">
                 <div class="label-row">
-                  <label for="body" class="form-label">Email Body / Message Content</label>
+                  <label for="body" class="form-label">Message Body</label>
                   <div class="body-stats">
                     <span id="char-count">0 chars</span>
                     <span class="bullet">•</span>
@@ -192,8 +235,8 @@
                 <textarea 
                   id="body" 
                   class="form-control form-textarea" 
-                  rows="9" 
-                  placeholder="Paste email body text here. Supports quoted conversation history, inline replies, and conversational language..."
+                  rows="8" 
+                  placeholder="Paste email message text here. Inspects body conversational cues, inline responses, and quoted email blocks..."
                 ></textarea>
               </div>
 
@@ -202,29 +245,29 @@
                 <summary class="headers-summary">
                   <span class="summary-left">
                     <span class="summary-arrow">▶</span>
-                    <span class="summary-title">Advanced Email Headers (In-Reply-To / References)</span>
+                    <span>RFC 822 Thread Headers (Optional)</span>
                   </span>
-                  <span class="summary-badge">Optional RFC Signals</span>
+                  <span class="summary-badge">In-Reply-To &amp; References</span>
                 </summary>
                 
                 <div class="headers-body">
                   <div class="header-field-grid">
                     <div class="form-group">
-                      <label for="in-reply-to" class="form-label">In-Reply-To Header</label>
+                      <label for="in-reply-to" class="form-label">In-Reply-To</label>
                       <input 
                         type="text" 
                         id="in-reply-to" 
                         class="form-control mono-font" 
-                        placeholder="<CABx24Jz9@mail.gmail.com>" 
+                        placeholder="<msg-id@domain.com>" 
                       />
                     </div>
                     <div class="form-group">
-                      <label for="references" class="form-label">References Header Chain</label>
+                      <label for="references" class="form-label">References Chain</label>
                       <input 
                         type="text" 
                         id="references" 
                         class="form-control mono-font" 
-                        placeholder="<msg-001@domain.com> <msg-002@domain.com>" 
+                        placeholder="<id1@domain.com> <id2@domain.com>" 
                       />
                     </div>
                   </div>
@@ -234,12 +277,21 @@
               <!-- Action Bar -->
               <div class="form-actions">
                 <button type="button" class="btn btn-primary" id="analyze-btn">
-                  <span class="btn-icon">⚡</span>
-                  <span class="btn-text">Analyze & Detect Thread</span>
-                  <span class="shortcut-tag">Ctrl + ↵</span>
+                  <span class="btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                  </span>
+                  <span class="btn-text">Analyze Thread</span>
+                  <span class="shortcut-tag">Ctrl+Enter</span>
                 </button>
                 <button type="button" class="btn btn-secondary" id="reset-btn">
-                  <span class="btn-icon">↺</span>
+                  <span class="btn-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="1 4 1 10 7 10"></polyline>
+                      <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                    </svg>
+                  </span>
                   <span>Clear</span>
                 </button>
               </div>
@@ -249,57 +301,55 @@
           </div>
 
           <!-- Right Column: Results & Thread Visualizer Hub -->
-          <div class="card glass-card results-card" id="results-container">
+          <div class="card results-card" id="results-container">
             
-            <!-- Empty Placeholder State -->
+            <!-- Clean Empty State (No gimmicks) -->
             <div class="empty-state" id="result-empty">
-              <div class="radar-visual">
-                <div class="radar-circle circle-1"></div>
-                <div class="radar-circle circle-2"></div>
-                <div class="radar-circle circle-3"></div>
-                <div class="radar-scan"></div>
-                <span class="radar-icon">🧵</span>
+              <div class="empty-illustration">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  <line x1="8" y1="10" x2="16" y2="10"></line>
+                </svg>
               </div>
-              <h3 class="empty-title">Awaiting Email Analysis</h3>
+              <h3 class="empty-title">Awaiting Email Input</h3>
               <p class="empty-desc">
-                Paste an email on the left or select a 1-click sample preset above.<br>
-                ThreadPulse AI will scan headers, body quotations, and neural linguistic patterns to determine if this email is part of a conversation thread.
+                Select a test scenario from the left or paste an email to inspect its thread topology, quoted history, and RFC message chain.
               </p>
               <div class="empty-features">
-                <span class="feature-tag">✦ DistilBERT AI Engine</span>
-                <span class="feature-tag">✦ RFC 2822 Header Check</span>
-                <span class="feature-tag">✦ Quoted Text Extractor</span>
+                <span class="feature-tag">Sequence Classifier</span>
+                <span class="feature-tag">RFC 2822 In-Reply-To</span>
+                <span class="feature-tag">Quoted Text Parser</span>
               </div>
             </div>
 
             <!-- Active Result State (Hidden by default) -->
             <div class="result-active-content" id="result-active" hidden>
               
-              <!-- Big Visual Verdict Banner -->
+              <!-- Professional Verdict Banner -->
               <div class="verdict-banner" id="verdict-banner">
                 <div class="verdict-icon-wrap" id="verdict-icon-wrap">
-                  <span id="verdict-icon">🧵</span>
+                  <span id="verdict-icon"></span>
                 </div>
                 <div class="verdict-text-wrap">
                   <div class="verdict-badge" id="verdict-badge">THREAD DETECTED</div>
-                  <h3 class="verdict-title" id="verdict-title">Part of an Ongoing Conversation</h3>
-                  <p class="verdict-subtitle" id="verdict-subtitle">This message is an active reply within an existing email thread.</p>
+                  <h3 class="verdict-title" id="verdict-title">Part of an Active Conversation Thread</h3>
+                  <p class="verdict-subtitle" id="verdict-subtitle">This message is an active reply within an existing conversation chain.</p>
                 </div>
                 <div class="verdict-score-box">
-                  <span class="score-label">Confidence</span>
-                  <span class="score-value" id="verdict-score">99.9%</span>
+                  <span class="score-label">Certainty</span>
+                  <span class="score-value" id="verdict-score">99.0%</span>
                 </div>
               </div>
 
-              <!-- Thread Chain Visualizer (Flow) -->
+              <!-- Conversation Thread Chain (Superhuman / Mail style) -->
               <div class="thread-chain-section" id="thread-chain-section">
                 <div class="section-title-row">
-                  <h4 class="section-title">Conversation Thread Flow Preview</h4>
-                  <span class="chain-status-badge" id="chain-status-badge">Multi-turn conversation</span>
+                  <h4 class="section-title">Conversation Chain Topology</h4>
+                  <span class="chain-status-badge" id="chain-status-badge">Multi-turn thread</span>
                 </div>
                 
                 <div class="thread-chain-flow" id="thread-chain-flow">
-                  <!-- Simulated Previous Node (shown when thread detected) -->
+                  <!-- Previous Node -->
                   <div class="thread-node node-previous" id="node-previous">
                     <div class="node-marker">
                       <span class="marker-dot"></span>
@@ -307,28 +357,28 @@
                     </div>
                     <div class="node-content">
                       <div class="node-header">
-                        <span class="node-sender">Original Thread Initiator</span>
-                        <span class="node-tag">Prior Message</span>
+                        <span class="node-sender">Prior Thread Message</span>
+                        <span class="node-tag">Origin</span>
                       </div>
-                      <p class="node-snippet" id="node-prev-snippet">Previous message in this thread context...</p>
+                      <p class="node-snippet" id="node-prev-snippet">Previous message context...</p>
                     </div>
                   </div>
 
                   <!-- Connector Arrow -->
                   <div class="thread-connector" id="thread-connector">
                     <div class="connector-line"></div>
-                    <span class="connector-badge">Reply Chain Link</span>
+                    <span class="connector-badge">Reply Link</span>
                   </div>
 
                   <!-- Current Email Node -->
                   <div class="thread-node node-current" id="node-current">
                     <div class="node-marker">
-                      <span class="marker-dot pulse"></span>
+                      <span class="marker-dot"></span>
                       <span class="node-seq" id="node-current-seq">Turn 2 (Incoming)</span>
                     </div>
                     <div class="node-content">
                       <div class="node-header">
-                        <span class="node-sender" id="node-current-subject">Re: Subject</span>
+                        <span class="node-sender" id="node-current-subject">Subject</span>
                         <span class="node-tag current-tag">Analyzed Email</span>
                       </div>
                       <p class="node-snippet" id="node-current-snippet">Current message text...</p>
@@ -337,12 +387,17 @@
                 </div>
               </div>
 
-              <!-- 4-Pillars Signal Matrix -->
+              <!-- 4-Pillars Diagnostic Signal Matrix -->
               <div class="signal-matrix">
                 <div class="signal-card" id="sig-model">
                   <div class="sig-header">
-                    <span class="sig-icon">🤖</span>
-                    <span class="sig-name">AI DistilBERT NLP</span>
+                    <span class="sig-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a4 4 0 0 1 4 4v2a4 4 0 0 1-8 0V6a4 4 0 0 1 4-4z"></path>
+                        <rect x="4" y="14" width="16" height="8" rx="2"></rect>
+                      </svg>
+                    </span>
+                    <span class="sig-name">Classifier</span>
                   </div>
                   <div class="sig-body">
                     <span class="sig-status" id="sig-model-status">Thread Reply</span>
@@ -354,59 +409,68 @@
 
                 <div class="signal-card" id="sig-subject">
                   <div class="sig-header">
-                    <span class="sig-icon">🏷️</span>
+                    <span class="sig-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                      </svg>
+                    </span>
                     <span class="sig-name">Subject Prefix</span>
                   </div>
                   <div class="sig-body">
-                    <span class="sig-status" id="sig-subject-status">"Re:" Detected</span>
-                    <span class="sig-sub" id="sig-subject-clean">Scope review</span>
+                    <span class="sig-status" id="sig-subject-status">"Re:" Tag</span>
+                    <span class="sig-sub" id="sig-subject-clean">Normalized topic</span>
                   </div>
                 </div>
 
                 <div class="signal-card" id="sig-headers">
                   <div class="sig-header">
-                    <span class="sig-icon">🔗</span>
+                    <span class="sig-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                      </svg>
+                    </span>
                     <span class="sig-name">RFC Headers</span>
                   </div>
                   <div class="sig-body">
-                    <span class="sig-status" id="sig-headers-status">In-Reply-To Found</span>
+                    <span class="sig-status" id="sig-headers-status">In-Reply-To</span>
                     <span class="sig-sub" id="sig-headers-sub">Direct link trace</span>
                   </div>
                 </div>
 
                 <div class="signal-card" id="sig-quotes">
                   <div class="sig-header">
-                    <span class="sig-icon">📜</span>
+                    <span class="sig-icon">
+                      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                      </svg>
+                    </span>
                     <span class="sig-name">Body Quotes</span>
                   </div>
                   <div class="sig-body">
-                    <span class="sig-status" id="sig-quotes-status">Quote Block Detected</span>
-                    <span class="sig-sub" id="sig-quotes-sub">Inline conversation</span>
+                    <span class="sig-status" id="sig-quotes-status">Quote Detected</span>
+                    <span class="sig-sub" id="sig-quotes-sub">Inline text excerpt</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Reasons & Clues List -->
+              <!-- Clues List -->
               <div class="reasons-section">
-                <h4 class="section-title">Detection Proof & Clues</h4>
-                <ul class="reasons-list" id="reasons-list">
-                  <!-- Injected via JS -->
-                </ul>
+                <h4 class="section-title">Evidence &amp; Heuristic Signals</h4>
+                <ul class="reasons-list" id="reasons-list"></ul>
               </div>
 
-              <!-- Extracted Quoted Snippet Drawer (if found) -->
+              <!-- Extracted Quoted Snippet Box -->
               <div class="quoted-snippet-box" id="quoted-snippet-box" hidden>
-                <div class="snippet-header">
-                  <span class="snippet-title">📜 Extracted Prior Conversation Quote Found in Body:</span>
-                </div>
+                <span class="snippet-title">Extracted Prior Conversation Quote Found in Body:</span>
                 <blockquote class="snippet-quote" id="snippet-quote-text"></blockquote>
               </div>
 
-              <!-- Class Probabilities Bar Breakdown -->
+              <!-- Class Probabilities Bar -->
               <div class="probabilities-section">
                 <div class="section-title-row">
-                  <h4 class="section-title">Class Distribution Probabilities</h4>
-                  <span class="model-tag">DistilBERT Sequence Head</span>
+                  <h4 class="section-title">Model Confidence Distribution</h4>
+                  <span class="model-tag">DistilBERT Head</span>
                 </div>
                 
                 <div class="prob-row">
@@ -436,52 +500,68 @@
         </div>
       </section>
 
-      <!-- VIEW 2: BATCH THREAD SCANNER -->
+      <!-- VIEW 2: BATCH SCANNER -->
       <section class="view-panel" id="view-batch" hidden>
-        <div class="card glass-card">
+        <div class="card">
           <div class="card-header">
             <div class="card-title-group">
-              <span class="section-badge">Batch Intelligence</span>
-              <h2 class="card-title">Multi-Email Thread Cluster Scanner</h2>
+              <span class="section-badge">Batch Clustering</span>
+              <h2 class="card-title">Multi-Message Thread Classifier</h2>
             </div>
             <div class="preset-btn-group">
               <button class="btn btn-secondary btn-sm" id="btn-load-sample-batch">
-                <span class="btn-icon">📥</span> Load Sample Inbox (4 Emails)
+                <span class="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                <span>Load Sample Inbox (4 Emails)</span>
               </button>
               <button class="btn btn-primary btn-sm" id="btn-run-batch">
-                <span class="btn-icon">⚡</span> Run Batch Scan
+                <span class="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                  </svg>
+                </span>
+                <span>Execute Batch Scan</span>
               </button>
             </div>
           </div>
 
           <p class="view-lead">
-            Scan multiple emails simultaneously. The engine detects thread replies and automatically clusters them into unified conversation threads.
+            Evaluate a batch of incoming messages. The engine identifies thread replies and aggregates them into unified conversation clusters.
           </p>
 
           <div class="batch-split">
             <div class="batch-input-area">
               <div class="label-row">
-                <label class="form-label">Email Batch JSON Payload</label>
-                <span class="label-hint">Array of emails with subject, body & headers</span>
+                <label class="form-label">Batch JSON Array</label>
+                <span class="label-hint">Array with id, sender, subject, body, headers</span>
               </div>
               <textarea id="batch-json-input" class="form-control mono-font batch-textarea" rows="12"></textarea>
             </div>
 
             <div class="batch-results-area" id="batch-results-area">
               <div class="batch-empty" id="batch-empty">
-                <span class="batch-empty-icon">🗂️</span>
+                <span class="batch-empty-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </span>
                 <h4>No Batch Run Yet</h4>
-                <p>Click "Load Sample Inbox" and hit "Run Batch Scan" to see conversation clusters.</p>
+                <p>Click "Load Sample Inbox" and click "Execute Batch Scan" to run clustering.</p>
               </div>
               
               <div class="batch-summary-cards" id="batch-summary" hidden>
                 <div class="cluster-summary-banner">
                   <div>
-                    <span class="cs-label">Detected Conversation Clusters:</span>
+                    <span class="cs-label">Conversation Clusters:</span>
                     <h3 class="cs-val" id="batch-clusters-count">0</h3>
                   </div>
                   <div>
-                    <span class="cs-label">Thread Replies Found:</span>
+                    <span class="cs-label">Thread Replies:</span>
                     <h3 class="cs-val text-emerald" id="batch-thread-count">0</h3>
                   </div>
                   <div>
@@ -490,9 +570,7 @@
                   </div>
                 </div>
 
-                <div class="clusters-container" id="clusters-container">
-                  <!-- Injected via JS -->
-                </div>
+                <div class="clusters-container" id="clusters-container"></div>
               </div>
             </div>
           </div>
@@ -502,18 +580,31 @@
 
       <!-- VIEW 3: SCAN LOG & HISTORY -->
       <section class="view-panel" id="view-history" hidden>
-        <div class="card glass-card">
+        <div class="card">
           <div class="card-header">
             <div class="card-title-group">
               <span class="section-badge">Audit Trail</span>
-              <h2 class="card-title">Session Scan History & Logs</h2>
+              <h2 class="card-title">Session Evaluation History</h2>
             </div>
             <div class="preset-btn-group">
               <button class="btn btn-secondary btn-sm" id="btn-export-history">
-                <span class="btn-icon">💾</span> Export JSON
+                <span class="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </span>
+                <span>Export JSON</span>
               </button>
               <button class="btn btn-ghost btn-sm text-danger" id="btn-clear-history">
-                <span class="btn-icon">🗑️</span> Clear Log
+                <span class="btn-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  </svg>
+                </span>
+                <span>Clear</span>
               </button>
             </div>
           </div>
@@ -535,9 +626,9 @@
                 <tr>
                   <th>Timestamp</th>
                   <th>Subject</th>
-                  <th>Thread Status</th>
-                  <th>AI Confidence</th>
-                  <th>Signals</th>
+                  <th>Classification</th>
+                  <th>Confidence</th>
+                  <th>Corroborating Signals</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -559,26 +650,31 @@
       <div class="modal-card">
         <div class="modal-header">
           <div class="modal-title-wrap">
-            <span class="modal-icon">📋</span>
-            <h3 class="modal-title">Paste Raw Email (EML / RFC Headers + Body)</h3>
+            <span class="modal-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </span>
+            <h3 class="modal-title">Paste Raw Email (RFC 822 / EML)</h3>
           </div>
           <button class="btn-close-modal" id="btn-raw-modal-close">&times;</button>
         </div>
         <div class="modal-body">
           <p class="modal-desc">
-            Paste raw email text containing headers like <code>Subject:</code>, <code>In-Reply-To:</code>, <code>References:</code> and body. We will automatically parse and place them into the studio!
+            Paste raw email text containing headers like <code>Subject:</code>, <code>In-Reply-To:</code>, <code>References:</code> and body. The parser will extract them into the studio.
           </p>
-          <textarea id="raw-email-input" class="form-control mono-font modal-textarea" rows="10" placeholder="Subject: Re: Proposal discussion
+          <textarea id="raw-email-input" class="form-control mono-font modal-textarea" rows="10" placeholder="Subject: Re: Proposal review
 In-Reply-To: <orig123@acme.com>
 References: <orig123@acme.com>
 
 Hi Alex,
-Thanks for sending over the proposal. We agree with the budget."></textarea>
+Thanks for the update. We agree with the proposed budget."></textarea>
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" id="btn-raw-cancel">Cancel</button>
           <button class="btn btn-primary" id="btn-raw-parse">
-            <span>Auto-Parse & Populate</span>
+            <span>Parse &amp; Populate</span>
           </button>
         </div>
       </div>
@@ -587,12 +683,12 @@ Thanks for sending over the proposal. We agree with the budget."></textarea>
     <!-- Footer -->
     <footer class="app-footer">
       <div class="footer-left">
-        <span class="footer-brand">ThreadPulse AI</span>
+        <span class="footer-brand">ThreadScope</span>
         <span class="footer-dot">•</span>
-        <span>Fine-tuned DistilBERT + RFC Header Heuristics</span>
+        <span>DistilBERT Sequence Classifier &amp; RFC 822 Heuristic Engine</span>
       </div>
       <div class="footer-right">
-        <span class="footer-status-tag">🟢 Neural Backend Online</span>
+        <span class="footer-status-tag">Service Active</span>
       </div>
     </footer>
 
