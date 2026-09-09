@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ThreadPulse AI — High-accuracy Email Thread Detector & Conversation Analytics Dashboard powered by fine-tuned DistilBERT and RFC Header heuristics." />
+  <title>ThreadPulse AI — Email Thread Detector & Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand-logo">
+          <div class="logo-glow"></div>
+          <span class="logo-icon">⚡</span>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title-wrap">
+            <h1 class="brand-title">ThreadPulse<span class="highlight">.AI</span></h1>
+            <span class="version-tag">v2.0</span>
+          </div>
+          <p class="brand-subtitle">Email Conversation & Thread Detection Intelligence</p>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <nav class="nav-tabs" role="tablist">
+          <button class="nav-tab active" id="tab-analyzer" role="tab" aria-selected="true" data-target="view-analyzer">
+            <span class="tab-icon">🔍</span>
+            <span>Thread Analyzer</span>
+          </button>
+          <button class="nav-tab" id="tab-batch" role="tab" aria-selected="false" data-target="view-batch">
+            <span class="tab-icon">📦</span>
+            <span>Batch Thread Scanner</span>
+          </button>
+          <button class="nav-tab" id="tab-history" role="tab" aria-selected="false" data-target="view-history">
+            <span class="tab-icon">📊</span>
+            <span>Scan Log & History</span>
+            <span class="history-badge" id="nav-history-count">0</span>
+          </button>
+        </nav>
+      </div>
+
+      <div class="header-right">
+        <div class="server-status-pill" id="server-status">
+          <span class="status-dot pulsing"></span>
+          <span class="status-label" id="status-label">DistilBERT Local AI: Ready</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Top KPI Metric Dashboard Cards -->
+    <section class="dashboard-kpis" aria-label="Detection Metrics Dashboard">
+      <div class="kpi-card" id="kpi-total-card">
+        <div class="kpi-icon-wrap kpi-blue">
+          <span>📨</span>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Total Emails Evaluated</span>
+          <div class="kpi-value-row">
+            <h2 class="kpi-value" id="kpi-total">0</h2>
+            <span class="kpi-subtext">emails scanned</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="kpi-threads-card">
+        <div class="kpi-icon-wrap kpi-emerald">
+          <span>🧵</span>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Threads Detected</span>
+          <div class="kpi-value-row">
+            <h2 class="kpi-value kpi-emerald-text" id="kpi-threads">0</h2>
+            <span class="kpi-chip kpi-emerald-chip" id="kpi-thread-pct">0%</span>
+          </div>
+        </div>
+        <div class="kpi-progress">
+          <div class="kpi-progress-bar bar-emerald" id="kpi-thread-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="kpi-standalone-card">
+        <div class="kpi-icon-wrap kpi-cyan">
+          <span>✉️</span>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Standalone / New Emails</span>
+          <div class="kpi-value-row">
+            <h2 class="kpi-value kpi-cyan-text" id="kpi-standalone">0</h2>
+            <span class="kpi-chip kpi-cyan-chip" id="kpi-standalone-pct">0%</span>
+          </div>
+        </div>
+        <div class="kpi-progress">
+          <div class="kpi-progress-bar bar-cyan" id="kpi-standalone-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="kpi-confidence-card">
+        <div class="kpi-icon-wrap kpi-violet">
+          <span>🎯</span>
+        </div>
+        <div class="kpi-info">
+          <span class="kpi-label">Average AI Confidence</span>
+          <div class="kpi-value-row">
+            <h2 class="kpi-value kpi-violet-text" id="kpi-confidence">0.0%</h2>
+            <span class="kpi-subtext">DistilBERT certainty</span>
+          </div>
+        </div>
+        <div class="kpi-progress">
+          <div class="kpi-progress-bar bar-violet" id="kpi-confidence-bar" style="width: 0%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+      <!-- VIEW 1: SINGLE EMAIL THREAD ANALYZER -->
+      <section class="view-panel active" id="view-analyzer">
+        <div class="analyzer-grid">
+          
+          <!-- Left Column: Input Studio -->
+          <div class="card glass-card studio-card">
+            
+            <div class="card-header">
+              <div class="card-title-group">
+                <span class="section-badge">Input Studio</span>
+                <h2 class="card-title">Inspect Email for Thread Signals</h2>
+              </div>
+              <div class="preset-btn-group">
+                <button class="btn-ghost btn-sm" id="btn-raw-modal-open" title="Paste raw email message with RFC headers">
+                  <span class="btn-icon">📋</span> Paste Raw EML
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick Preset Samples -->
+            <div class="preset-samples-wrapper">
+              <span class="preset-samples-title">1-Click Quick Samples:</span>
+              <div class="preset-chips">
+                <button class="sample-chip" data-sample="reply-full">
+                  <span class="sample-icon">💬</span> Re: Scope Clarification (Thread)
+                </button>
+                <button class="sample-chip" data-sample="quote-body">
+                  <span class="sample-icon">↩️</span> Quoted Text Reply (Thread)
+                </button>
+                <button class="sample-chip" data-sample="standalone-sales">
+                  <span class="sample-icon">📢</span> Cold Enterprise Outreach (New)
+                </button>
+                <button class="sample-chip" data-sample="fwd-approval">
+                  <span class="sample-icon">📨</span> Fwd: Budget Sign-off (Thread)
+                </button>
+              </div>
+            </div>
+
+            <!-- Input Fields -->
+            <form id="email-form" class="studio-form" onsubmit="return false;">
+              <div class="form-group">
+                <div class="label-row">
+                  <label for="subject" class="form-label">Email Subject</label>
+                  <span class="label-hint" id="subject-hint">Checked for Re:, Fwd: prefixes</span>
+                </div>
+                <div class="input-with-icon">
+                  <span class="input-icon">🏷️</span>
+                  <input 
+                    type="text" 
+                    id="subject" 
+                    class="form-control" 
+                    placeholder="e.g. Re: Q3 Product Roadmap & Sprint Timelines" 
+                    autocomplete="off"
+                  />
+                  <button type="button" class="btn-clear-field" id="clear-subject" title="Clear Subject" hidden>&times;</button>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <div class="label-row">
+                  <label for="body" class="form-label">Email Body / Message Content</label>
+                  <div class="body-stats">
+                    <span id="char-count">0 chars</span>
+                    <span class="bullet">•</span>
+                    <span id="word-count">0 words</span>
+                  </div>
+                </div>
+                <textarea 
+                  id="body" 
+                  class="form-control form-textarea" 
+                  rows="9" 
+                  placeholder="Paste email body text here. Supports quoted conversation history, inline replies, and conversational language..."
+                ></textarea>
+              </div>
+
+              <!-- Collapsible RFC Headers -->
+              <details class="headers-accordion" id="headers-accordion">
+                <summary class="headers-summary">
+                  <span class="summary-left">
+                    <span class="summary-arrow">▶</span>
+                    <span class="summary-title">Advanced Email Headers (In-Reply-To / References)</span>
+                  </span>
+                  <span class="summary-badge">Optional RFC Signals</span>
+                </summary>
+                
+                <div class="headers-body">
+                  <div class="header-field-grid">
+                    <div class="form-group">
+                      <label for="in-reply-to" class="form-label">In-Reply-To Header</label>
+                      <input 
+                        type="text" 
+                        id="in-reply-to" 
+                        class="form-control mono-font" 
+                        placeholder="<CABx24Jz9@mail.gmail.com>" 
+                      />
+                    </div>
+                    <div class="form-group">
+                      <label for="references" class="form-label">References Header Chain</label>
+                      <input 
+                        type="text" 
+                        id="references" 
+                        class="form-control mono-font" 
+                        placeholder="<msg-001@domain.com> <msg-002@domain.com>" 
+                      />
+                    </div>
+                  </div>
+                </div>
+              </details>
+
+              <!-- Action Bar -->
+              <div class="form-actions">
+                <button type="button" class="btn btn-primary" id="analyze-btn">
+                  <span class="btn-icon">⚡</span>
+                  <span class="btn-text">Analyze & Detect Thread</span>
+                  <span class="shortcut-tag">Ctrl + ↵</span>
+                </button>
+                <button type="button" class="btn btn-secondary" id="reset-btn">
+                  <span class="btn-icon">↺</span>
+                  <span>Clear</span>
+                </button>
+              </div>
+              <div class="form-status" id="status-message"></div>
+            </form>
+
+          </div>
+
+          <!-- Right Column: Results & Thread Visualizer Hub -->
+          <div class="card glass-card results-card" id="results-container">
+            
+            <!-- Empty Placeholder State -->
+            <div class="empty-state" id="result-empty">
+              <div class="radar-visual">
+                <div class="radar-circle circle-1"></div>
+                <div class="radar-circle circle-2"></div>
+                <div class="radar-circle circle-3"></div>
+                <div class="radar-scan"></div>
+                <span class="radar-icon">🧵</span>
+              </div>
+              <h3 class="empty-title">Awaiting Email Analysis</h3>
+              <p class="empty-desc">
+                Paste an email on the left or select a 1-click sample preset above.<br>
+                ThreadPulse AI will scan headers, body quotations, and neural linguistic patterns to determine if this email is part of a conversation thread.
+              </p>
+              <div class="empty-features">
+                <span class="feature-tag">✦ DistilBERT AI Engine</span>
+                <span class="feature-tag">✦ RFC 2822 Header Check</span>
+                <span class="feature-tag">✦ Quoted Text Extractor</span>
+              </div>
+            </div>
+
+            <!-- Active Result State (Hidden by default) -->
+            <div class="result-active-content" id="result-active" hidden>
+              
+              <!-- Big Visual Verdict Banner -->
+              <div class="verdict-banner" id="verdict-banner">
+                <div class="verdict-icon-wrap" id="verdict-icon-wrap">
+                  <span id="verdict-icon">🧵</span>
+                </div>
+                <div class="verdict-text-wrap">
+                  <div class="verdict-badge" id="verdict-badge">THREAD DETECTED</div>
+                  <h3 class="verdict-title" id="verdict-title">Part of an Ongoing Conversation</h3>
+                  <p class="verdict-subtitle" id="verdict-subtitle">This message is an active reply within an existing email thread.</p>
+                </div>
+                <div class="verdict-score-box">
+                  <span class="score-label">Confidence</span>
+                  <span class="score-value" id="verdict-score">99.9%</span>
+                </div>
+              </div>
+
+              <!-- Thread Chain Visualizer (Flow) -->
+              <div class="thread-chain-section" id="thread-chain-section">
+                <div class="section-title-row">
+                  <h4 class="section-title">Conversation Thread Flow Preview</h4>
+                  <span class="chain-status-badge" id="chain-status-badge">Multi-turn conversation</span>
+                </div>
+                
+                <div class="thread-chain-flow" id="thread-chain-flow">
+                  <!-- Simulated Previous Node (shown when thread detected) -->
+                  <div class="thread-node node-previous" id="node-previous">
+                    <div class="node-marker">
+                      <span class="marker-dot"></span>
+                      <span class="node-seq">Turn 1</span>
+                    </div>
+                    <div class="node-content">
+                      <div class="node-header">
+                        <span class="node-sender">Original Thread Initiator</span>
+                        <span class="node-tag">Prior Message</span>
+                      </div>
+                      <p class="node-snippet" id="node-prev-snippet">Previous message in this thread context...</p>
+                    </div>
+                  </div>
+
+                  <!-- Connector Arrow -->
+                  <div class="thread-connector" id="thread-connector">
+                    <div class="connector-line"></div>
+                    <span class="connector-badge">Reply Chain Link</span>
+                  </div>
+
+                  <!-- Current Email Node -->
+                  <div class="thread-node node-current" id="node-current">
+                    <div class="node-marker">
+                      <span class="marker-dot pulse"></span>
+                      <span class="node-seq" id="node-current-seq">Turn 2 (Incoming)</span>
+                    </div>
+                    <div class="node-content">
+                      <div class="node-header">
+                        <span class="node-sender" id="node-current-subject">Re: Subject</span>
+                        <span class="node-tag current-tag">Analyzed Email</span>
+                      </div>
+                      <p class="node-snippet" id="node-current-snippet">Current message text...</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4-Pillars Signal Matrix -->
+              <div class="signal-matrix">
+                <div class="signal-card" id="sig-model">
+                  <div class="sig-header">
+                    <span class="sig-icon">🤖</span>
+                    <span class="sig-name">AI DistilBERT NLP</span>
+                  </div>
+                  <div class="sig-body">
+                    <span class="sig-status" id="sig-model-status">Thread Reply</span>
+                    <div class="mini-bar-track">
+                      <div class="mini-bar-fill" id="sig-model-bar" style="width: 99%;"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="signal-card" id="sig-subject">
+                  <div class="sig-header">
+                    <span class="sig-icon">🏷️</span>
+                    <span class="sig-name">Subject Prefix</span>
+                  </div>
+                  <div class="sig-body">
+                    <span class="sig-status" id="sig-subject-status">"Re:" Detected</span>
+                    <span class="sig-sub" id="sig-subject-clean">Scope review</span>
+                  </div>
+                </div>
+
+                <div class="signal-card" id="sig-headers">
+                  <div class="sig-header">
+                    <span class="sig-icon">🔗</span>
+                    <span class="sig-name">RFC Headers</span>
+                  </div>
+                  <div class="sig-body">
+                    <span class="sig-status" id="sig-headers-status">In-Reply-To Found</span>
+                    <span class="sig-sub" id="sig-headers-sub">Direct link trace</span>
+                  </div>
+                </div>
+
+                <div class="signal-card" id="sig-quotes">
+                  <div class="sig-header">
+                    <span class="sig-icon">📜</span>
+                    <span class="sig-name">Body Quotes</span>
+                  </div>
+                  <div class="sig-body">
+                    <span class="sig-status" id="sig-quotes-status">Quote Block Detected</span>
+                    <span class="sig-sub" id="sig-quotes-sub">Inline conversation</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reasons & Clues List -->
+              <div class="reasons-section">
+                <h4 class="section-title">Detection Proof & Clues</h4>
+                <ul class="reasons-list" id="reasons-list">
+                  <!-- Injected via JS -->
+                </ul>
+              </div>
+
+              <!-- Extracted Quoted Snippet Drawer (if found) -->
+              <div class="quoted-snippet-box" id="quoted-snippet-box" hidden>
+                <div class="snippet-header">
+                  <span class="snippet-title">📜 Extracted Prior Conversation Quote Found in Body:</span>
+                </div>
+                <blockquote class="snippet-quote" id="snippet-quote-text"></blockquote>
+              </div>
+
+              <!-- Class Probabilities Bar Breakdown -->
+              <div class="probabilities-section">
+                <div class="section-title-row">
+                  <h4 class="section-title">Class Distribution Probabilities</h4>
+                  <span class="model-tag">DistilBERT Sequence Head</span>
+                </div>
+                
+                <div class="prob-row">
+                  <div class="prob-meta">
+                    <span class="prob-name">Thread Reply</span>
+                    <span class="prob-val" id="prob-reply-val">0%</span>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill bar-emerald" id="prob-reply-bar" style="width: 0%;"></div>
+                  </div>
+                </div>
+
+                <div class="prob-row">
+                  <div class="prob-meta">
+                    <span class="prob-name">Standalone New Email</span>
+                    <span class="prob-val" id="prob-new-val">0%</span>
+                  </div>
+                  <div class="bar-track">
+                    <div class="bar-fill bar-cyan" id="prob-new-bar" style="width: 0%;"></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 2: BATCH THREAD SCANNER -->
+      <section class="view-panel" id="view-batch" hidden>
+        <div class="card glass-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="section-badge">Batch Intelligence</span>
+              <h2 class="card-title">Multi-Email Thread Cluster Scanner</h2>
+            </div>
+            <div class="preset-btn-group">
+              <button class="btn btn-secondary btn-sm" id="btn-load-sample-batch">
+                <span class="btn-icon">📥</span> Load Sample Inbox (4 Emails)
+              </button>
+              <button class="btn btn-primary btn-sm" id="btn-run-batch">
+                <span class="btn-icon">⚡</span> Run Batch Scan
+              </button>
+            </div>
+          </div>
+
+          <p class="view-lead">
+            Scan multiple emails simultaneously. The engine detects thread replies and automatically clusters them into unified conversation threads.
+          </p>
+
+          <div class="batch-split">
+            <div class="batch-input-area">
+              <div class="label-row">
+                <label class="form-label">Email Batch JSON Payload</label>
+                <span class="label-hint">Array of emails with subject, body & headers</span>
+              </div>
+              <textarea id="batch-json-input" class="form-control mono-font batch-textarea" rows="12"></textarea>
+            </div>
+
+            <div class="batch-results-area" id="batch-results-area">
+              <div class="batch-empty" id="batch-empty">
+                <span class="batch-empty-icon">🗂️</span>
+                <h4>No Batch Run Yet</h4>
+                <p>Click "Load Sample Inbox" and hit "Run Batch Scan" to see conversation clusters.</p>
+              </div>
+              
+              <div class="batch-summary-cards" id="batch-summary" hidden>
+                <div class="cluster-summary-banner">
+                  <div>
+                    <span class="cs-label">Detected Conversation Clusters:</span>
+                    <h3 class="cs-val" id="batch-clusters-count">0</h3>
+                  </div>
+                  <div>
+                    <span class="cs-label">Thread Replies Found:</span>
+                    <h3 class="cs-val text-emerald" id="batch-thread-count">0</h3>
+                  </div>
+                  <div>
+                    <span class="cs-label">Standalone Inquiries:</span>
+                    <h3 class="cs-val text-cyan" id="batch-standalone-count">0</h3>
+                  </div>
+                </div>
+
+                <div class="clusters-container" id="clusters-container">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 3: SCAN LOG & HISTORY -->
+      <section class="view-panel" id="view-history" hidden>
+        <div class="card glass-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <span class="section-badge">Audit Trail</span>
+              <h2 class="card-title">Session Scan History & Logs</h2>
+            </div>
+            <div class="preset-btn-group">
+              <button class="btn btn-secondary btn-sm" id="btn-export-history">
+                <span class="btn-icon">💾</span> Export JSON
+              </button>
+              <button class="btn btn-ghost btn-sm text-danger" id="btn-clear-history">
+                <span class="btn-icon">🗑️</span> Clear Log
+              </button>
+            </div>
+          </div>
+
+          <div class="history-controls">
+            <div class="filter-pills">
+              <button class="filter-pill active" data-filter="all">All (<span id="count-all">0</span>)</button>
+              <button class="filter-pill" data-filter="thread">Threads Only (<span id="count-threads">0</span>)</button>
+              <button class="filter-pill" data-filter="new">Standalone Only (<span id="count-new">0</span>)</button>
+            </div>
+            <div class="search-wrap">
+              <input type="text" id="history-search" class="form-control form-control-sm" placeholder="Search subject or keyword..." />
+            </div>
+          </div>
+
+          <div class="history-table-wrap">
+            <table class="history-table" id="history-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Subject</th>
+                  <th>Thread Status</th>
+                  <th>AI Confidence</th>
+                  <th>Signals</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="history-tbody">
+                <tr>
+                  <td colspan="6" class="table-empty">No scan records in this session yet. Run an analysis above!</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Modal: Raw RFC822 / EML Parser -->
+    <div class="modal-backdrop" id="raw-modal" hidden>
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <span class="modal-icon">📋</span>
+            <h3 class="modal-title">Paste Raw Email (EML / RFC Headers + Body)</h3>
+          </div>
+          <button class="btn-close-modal" id="btn-raw-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-desc">
+            Paste raw email text containing headers like <code>Subject:</code>, <code>In-Reply-To:</code>, <code>References:</code> and body. We will automatically parse and place them into the studio!
+          </p>
+          <textarea id="raw-email-input" class="form-control mono-font modal-textarea" rows="10" placeholder="Subject: Re: Proposal discussion
+In-Reply-To: <orig123@acme.com>
+References: <orig123@acme.com>
+
+Hi Alex,
+Thanks for sending over the proposal. We agree with the budget."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-raw-cancel">Cancel</button>
+          <button class="btn btn-primary" id="btn-raw-parse">
+            <span>Auto-Parse & Populate</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-left">
+        <span class="footer-brand">ThreadPulse AI</span>
+        <span class="footer-dot">•</span>
+        <span>Fine-tuned DistilBERT + RFC Header Heuristics</span>
+      </div>
+      <div class="footer-right">
+        <span class="footer-status-tag">🟢 Neural Backend Online</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
