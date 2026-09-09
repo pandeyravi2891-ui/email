@@ -139,6 +139,86 @@ def fuse_prediction(model_label, model_confidence, sig):
 
 
 # ---------------------------------------------------------------------------
+# Spam & Phishing Detection Rules
+# ---------------------------------------------------------------------------
+SPAM_RULES = [
+    (r"\b(crypto|cryptocurrency|bitcoin|btc|eth|binance|forex|binary option|guaranteed profit|double your money|investment returns?)\b", "High-risk crypto or investment scheme keywords", 0.40),
+    (r"\b(wire transfer|bank account details|western union|moneygram|beneficiary|inheritance|compensation fund|transfer fee|unclaimed funds?)\b", "Wire transfer or inheritance scam pattern", 0.45),
+    (r"\b(lottery|jackpot|lucky winner|claim your prize|congratulations you won|awarded a sum of|\$\d+[\d,.]*\s*(million|usd|dollars)?)\b", "Lottery or prize award phrasing", 0.45),
+    (r"\b(urgent(ly)?|immediate action required|account suspended|verify your (account|identity|password|credentials)|unauthorized (login|access)|security alert|within 24 hours)\b", "Urgency pressure or credential verification alert", 0.38),
+    (r"\b(click (here|below) to (verify|login|restore|unlock)|login to your account to confirm|update your billing details)\b", "Suspicious link call-to-action", 0.40),
+    (r"\b(password|ssn|social security|credit card number|cvv|pin code)\b", "Direct solicitation of sensitive credentials", 0.45),
+    (r"\b(100% free|risk[- ]free|no credit card required|exclusive deal|act now|limited time offer|meet singles|viagra|cialis)\b", "Aggressive promotional spam markers", 0.30),
+    (r"\b(earn (\$\d+|\d+\$|money from home)|make money online|work from home opportunity)\b", "Get-rich / work-from-home solicitation", 0.35),
+]
+
+TRUST_RULES = [
+    (r"\b(as discussed|per our conversation|attached is the|agenda for|meeting notes|status update|pull request|jira|github|roadmap|deliverables)\b", "Legitimate business context", 0.20),
+    (r"\b(thanks for (getting back|the update|the follow.?up|following up|reaching out|clarifying|the info))\b", "Conversational relationship context", 0.25),
+]
+
+
+def detect_spam(subject, body, headers=None, is_thread=False):
+    subject_str = subject or ""
+    body_str = body or ""
+    full_text = f"{subject_str}\n{body_str}"
+
+    triggers = []
+    trust_factors = []
+    spam_score = 0.05
+
+    # Check spam keywords
+    for pattern, reason, weight in SPAM_RULES:
+        match = re.search(pattern, full_text, re.IGNORECASE)
+        if match:
+            spam_score += weight
+            triggers.append(f"{reason} (matched: '{match.group(0)}')")
+
+    # Check formatting red flags
+    words = [w for w in re.findall(r"\b[A-Za-z]+\b", full_text) if len(w) > 3]
+    if words:
+        caps_words = [w for w in words if w.isupper()]
+        caps_ratio = len(caps_words) / len(words)
+        if caps_ratio > 0.35 and len(caps_words) >= 3:
+            spam_score += 0.25
+            triggers.append(f"Excessive capitalization detected ({round(caps_ratio * 100)}% ALL-CAPS words)")
+
+    if re.search(r"(\!{3,}|\${2,}|\?{3,})", full_text):
+        spam_score += 0.15
+        triggers.append("Multiple exclamation marks or currency symbols used for urgency")
+
+    # Trust factors
+    if is_thread:
+        spam_score -= 0.30
+        trust_factors.append("Message is part of an ongoing conversation thread (replies have high trust)")
+
+    headers = headers or {}
+    if headers.get("In-Reply-To") or headers.get("in_reply_to") or headers.get("References"):
+        spam_score -= 0.20
+        trust_factors.append("Valid RFC conversation headers present")
+
+    for pattern, reason, weight in TRUST_RULES:
+        if re.search(pattern, full_text, re.IGNORECASE):
+            spam_score -= weight
+            trust_factors.append(reason)
+
+    # Clamp spam score between 0.01 and 0.99
+    spam_score = max(0.01, min(0.99, spam_score))
+    is_spam = spam_score >= 0.45
+    risk_level = "CRITICAL" if spam_score >= 0.75 else ("HIGH" if spam_score >= 0.50 else ("MEDIUM" if spam_score >= 0.30 else "LOW"))
+
+    return {
+        "is_spam": is_spam,
+        "spam_score": round(spam_score, 4),
+        "spam_percentage": round(spam_score * 100, 1),
+        "risk_level": risk_level,
+        "verdict": "SPAM DETECTED" if is_spam else "NOT SPAM (SAFE)",
+        "triggers": triggers,
+        "trust_factors": trust_factors,
+    }
+
+
+# ---------------------------------------------------------------------------
 # Load model + tokenizer once at startup
 # ---------------------------------------------------------------------------
 print("Loading tokenizer + model from", MODEL_DIR, "(fully local, no internet needed)")
@@ -172,6 +252,8 @@ def predict(subject, body, headers=None):
     if sig["has_in_reply_to"] or sig["has_references"] or sig["has_quoted_history"]:
         effective_confidence = max(model_confidence, 0.985)
 
+    spam_analysis = detect_spam(subject, body, headers, is_thread)
+
     return {
         "is_thread": is_thread,
         "final_prediction": final_label,
@@ -181,6 +263,7 @@ def predict(subject, body, headers=None):
         "probabilities": {LABELS[i]: round(float(p), 4) for i, p in enumerate(probs)},
         "structural_signals": sig,
         "detection_reasons": reasons,
+        "spam_analysis": spam_analysis,
     }
 
 

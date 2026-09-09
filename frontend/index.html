@@ -24,10 +24,10 @@
         </div>
         <div class="brand-text">
           <div class="brand-title-wrap">
-            <h1 class="brand-title">ThreadScope</h1>
-            <span class="version-tag">v1.4</span>
+            <h1 class="brand-title">Email Inspector</h1>
+            <span class="version-tag">Spam &amp; Thread Detector</span>
           </div>
-          <p class="brand-subtitle">Email Conversation Triage & RFC Header Intelligence</p>
+          <p class="brand-subtitle">Email daalein aur turant check karein ki email Spam hai ya Safe</p>
         </div>
       </div>
 
@@ -177,23 +177,23 @@
 
             <!-- Quick Preset Samples -->
             <div class="preset-samples-wrapper">
-              <span class="preset-samples-title">Test Scenarios:</span>
+              <span class="preset-samples-title">1-Click Test Scenarios:</span>
               <div class="preset-chips">
+                <button class="sample-chip" data-sample="spam-phishing">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                  <span>🚨 Phishing Alert (Spam)</span>
+                </button>
+                <button class="sample-chip" data-sample="spam-lottery">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                  <span>🎁 $2.5M Lottery (Spam)</span>
+                </button>
                 <button class="sample-chip" data-sample="reply-full">
                   <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                  <span>Client Scope Clarification (Reply)</span>
-                </button>
-                <button class="sample-chip" data-sample="quote-body">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"></polyline><path d="M20 20v-7a4 4 0 0 0-4-4H4"></path></svg>
-                  <span>Quoted Sprint Discussion (Reply)</span>
+                  <span>💬 Client Scope Reply (Safe)</span>
                 </button>
                 <button class="sample-chip" data-sample="standalone-sales">
                   <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                  <span>Cold Outbound Intro (Standalone)</span>
-                </button>
-                <button class="sample-chip" data-sample="fwd-approval">
-                  <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"></polyline><path d="M4 20v-7a4 4 0 0 1 4-4h12"></path></svg>
-                  <span>Budget Approval Sign-off (Forward)</span>
+                  <span>✉️ Business Outreach (Safe)</span>
                 </button>
               </div>
             </div>
@@ -306,26 +306,48 @@
             <!-- Clean Empty State (No gimmicks) -->
             <div class="empty-state" id="result-empty">
               <div class="empty-illustration">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  <line x1="8" y1="10" x2="16" y2="10"></line>
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 </svg>
               </div>
-              <h3 class="empty-title">Awaiting Email Input</h3>
+              <h3 class="empty-title">Email Check Karne Ke Liye Ready</h3>
               <p class="empty-desc">
-                Select a test scenario from the left or paste an email to inspect its thread topology, quoted history, and RFC message chain.
+                Email subject aur body daalein ya upar diye gaye 1-click test scenarios par click karein. System turant bata dega ki email <strong>SPAM hai ya SAFE</strong>.
               </p>
               <div class="empty-features">
-                <span class="feature-tag">Sequence Classifier</span>
-                <span class="feature-tag">RFC 2822 In-Reply-To</span>
-                <span class="feature-tag">Quoted Text Parser</span>
+                <span class="feature-tag">Spam / Phishing Detection</span>
+                <span class="feature-tag">Financial Scam Defense</span>
+                <span class="feature-tag">Thread Conversation Triage</span>
               </div>
             </div>
 
             <!-- Active Result State (Hidden by default) -->
             <div class="result-active-content" id="result-active" hidden>
               
-              <!-- Professional Verdict Banner -->
+              <!-- 1. Primary SPAM Verdict Banner (Clear & Prominent) -->
+              <div class="spam-verdict-banner is-safe" id="spam-verdict-banner">
+                <div class="spam-icon-wrap" id="spam-icon-wrap">
+                  <span id="spam-icon"></span>
+                </div>
+                <div class="spam-text-wrap">
+                  <div class="spam-badge" id="spam-badge">SAFE EMAIL</div>
+                  <h3 class="spam-title" id="spam-title">Email Safe Hai (Not Spam)</h3>
+                  <p class="spam-subtitle" id="spam-subtitle">Isme koi phishing ya scam triggers nahi mile.</p>
+                </div>
+                <div class="spam-score-box">
+                  <span class="spam-score-label">Spam Risk</span>
+                  <span class="spam-score-value" id="spam-score-val">5%</span>
+                  <span class="spam-risk-badge low" id="spam-risk-badge">LOW</span>
+                </div>
+              </div>
+
+              <!-- Spam Indicators & Security Reasons -->
+              <div class="reasons-section" id="spam-signals-section">
+                <h4 class="section-title">Security &amp; Spam Analysis Signals</h4>
+                <ul class="reasons-list" id="spam-reasons-list"></ul>
+              </div>
+
+              <!-- 2. Conversation Thread Status Banner -->
               <div class="verdict-banner" id="verdict-banner">
                 <div class="verdict-icon-wrap" id="verdict-icon-wrap">
                   <span id="verdict-icon"></span>

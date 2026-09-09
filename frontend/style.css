@@ -942,11 +942,143 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 14px 18px;
   border-radius: var(--radius-md);
   background: var(--bg-canvas);
   border: 1px solid var(--border-default);
   gap: 16px;
+}
+
+/* Primary Spam & Security Verdict Banner */
+.spam-verdict-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-default);
+  gap: 16px;
+  transition: all var(--transition-fast);
+}
+
+.spam-verdict-banner.is-spam {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: linear-gradient(180deg, rgba(76, 5, 25, 0.4) 0%, rgba(9, 13, 22, 0.9) 100%);
+}
+
+.spam-verdict-banner.is-safe {
+  border-color: rgba(16, 185, 129, 0.4);
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.3) 0%, rgba(9, 13, 22, 0.9) 100%);
+}
+
+.spam-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spam-verdict-banner.is-spam .spam-icon-wrap {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #f87171;
+}
+
+.spam-verdict-banner.is-safe .spam-icon-wrap {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #34d399;
+}
+
+.spam-text-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex-grow: 1;
+}
+
+.spam-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.spam-verdict-banner.is-spam .spam-badge {
+  color: #f87171;
+}
+
+.spam-verdict-banner.is-safe .spam-badge {
+  color: #6ee7b7;
+}
+
+.spam-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.spam-subtitle {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.spam-score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding-left: 18px;
+  border-left: 1px solid var(--border-subtle);
+  min-width: 90px;
+}
+
+.spam-score-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+
+.spam-score-value {
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.spam-risk-badge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  margin-top: 2px;
+}
+
+.spam-risk-badge.critical,
+.spam-risk-badge.high {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.spam-risk-badge.low {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.spam-risk-badge.medium {
+  background: rgba(234, 179, 8, 0.2);
+  color: #fde047;
+  border: 1px solid rgba(234, 179, 8, 0.4);
 }
 
 .verdict-banner.thread {
